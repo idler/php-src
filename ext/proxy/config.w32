@@ -1,0 +1,13 @@
+// $Id$
+// vim:ft=javascript
+
+// If your extension references something external, use ARG_WITH
+// ARG_WITH("proxy", "for proxy support", "no");
+
+// Otherwise, use ARG_ENABLE
+// ARG_ENABLE("proxy", "enable proxy support", "no");
+
+if (PHP_PROXY != "no") {
+	EXTENSION("proxy", "proxy.c");
+}
+
