@@ -32,6 +32,11 @@ zend_class_entry *proxy_class_ce;
 
 static zend_function_entry proxy_methods[] = {
   PHP_ME(Proxy, getme, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Proxy, createOriginalObject, NULL, ZEND_ACC_PROTECTED)
+  PHP_ME(Proxy, resolve, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Proxy, __get, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Proxy, __set, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Proxy, __call, NULL, ZEND_ACC_PUBLIC)
   {NULL, NULL, NULL}
 };
  
@@ -43,6 +48,8 @@ void proxy_init_new(TSRMLS_D) {
  
   /* fields */
   zend_declare_property_bool(proxy_class_ce, "alive", strlen("alive"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_bool(proxy_class_ce, "is_resolved", strlen("is_resolved"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
+  zend_declare_property_bool(proxy_class_ce, "original", strlen("original"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
 }
  
 PHP_METHOD(Proxy, getme) {
@@ -50,6 +57,26 @@ PHP_METHOD(Proxy, getme) {
   // TODO                                                                                                                                                                   
 }
 
+PHP_METHOD(Proxy, createOriginalObject) {
+	RETURN_STRING("orig obj",1);
+  // TODO                                                                                                                                                                   
+}
+PHP_METHOD(Proxy, resolve) {
+	RETURN_STRING("resolve",1);
+  // TODO                                                                                                                                                                   
+}
+PHP_METHOD(Proxy, __get) {
+	RETURN_STRING("get",1);
+  // TODO                                                                                                                                                                   
+}
+PHP_METHOD(Proxy, __set) {
+	RETURN_STRING("set",1);
+  // TODO                                                                                                                                                                   
+}
+PHP_METHOD(Proxy, __call) {
+	RETURN_STRING("try to call ",1);
+  // TODO                                                                                                                                                                   
+}
 /* If you declare any globals in php_proxy.h uncomment this:
 ZEND_DECLARE_MODULE_GLOBALS(proxy)
 */

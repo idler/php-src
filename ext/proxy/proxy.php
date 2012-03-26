@@ -23,4 +23,6 @@ $t = new Proxy();
 $t->alive=false;
 var_dump(array($p,$p->getme(),$t,$t->getme()));
 
+var_dump(array($p->resolve(),$p->notexists_property,$p->thisIsNoMethod()));
+
 ?>

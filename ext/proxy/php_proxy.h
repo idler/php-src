@@ -47,7 +47,11 @@ PHP_FUNCTION(confirm_proxy_compiled);	/* For testing, remove later. */
 void proxy_init_new(TSRMLS_D);
  
 PHP_METHOD(Proxy,getme);
-
+PHP_METHOD(Proxy, createOriginalObject);
+PHP_METHOD(Proxy, resolve);
+PHP_METHOD(Proxy, __get);
+PHP_METHOD(Proxy, __set);
+PHP_METHOD(Proxy, __call);
 
 /* 
   	Declare any global variables you may need between the BEGIN
