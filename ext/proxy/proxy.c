@@ -12,8 +12,10 @@
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
   +----------------------------------------------------------------------+
-  | Author:                                                              |
+  | Author: Maxim Antonov <max.antonoff@gmail.com>                       |
   +----------------------------------------------------------------------+
+   *
+   * Idea of Proxy provided by Limb3 PHP Framwork ( http://limb-project.com/ )
 */
 
 /* $Id$ */
@@ -28,54 +30,106 @@
 #include "php_proxy.h"
 
 
+
+/* {{{ arginfo */
+ZEND_BEGIN_ARG_INFO_EX(arginfo_proxy_construct, 0, 0, 1)
+	ZEND_ARG_INFO(0, classname)
+ZEND_END_ARG_INFO()
+
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_proxy_get, 0, 0, 1)
+	ZEND_ARG_INFO(0, arg)
+ZEND_END_ARG_INFO()
+
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_proxy_set, 0, 0, 1)
+	ZEND_ARG_INFO(0, arga)
+	ZEND_ARG_INFO(0, argb)
+ZEND_END_ARG_INFO()
+
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_proxy_call, 0, 0, 1)
+	ZEND_ARG_INFO(0, arga)
+	ZEND_ARG_INFO(0, argb)
+ZEND_END_ARG_INFO()
+
+
+/* }}} */
+
 zend_class_entry *proxy_class_ce;
 
 static zend_function_entry proxy_methods[] = {
-  PHP_ME(Proxy, getme, NULL, ZEND_ACC_PUBLIC)
-  PHP_ME(Proxy, createOriginalObject, NULL, ZEND_ACC_PROTECTED)
-  PHP_ME(Proxy, resolve, NULL, ZEND_ACC_PUBLIC)
-  PHP_ME(Proxy, __get, NULL, ZEND_ACC_PUBLIC)
-  PHP_ME(Proxy, __set, NULL, ZEND_ACC_PUBLIC)
-  PHP_ME(Proxy, __call, NULL, ZEND_ACC_PUBLIC)
-  {NULL, NULL, NULL}
+	PHP_ME(Proxy, getme, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Proxy, createOriginalObject, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Proxy, resolve, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Proxy, __get, arginfo_proxy_get, ZEND_ACC_PUBLIC)
+	PHP_ME(Proxy, __set, arginfo_proxy_set, ZEND_ACC_PUBLIC)
+	PHP_ME(Proxy, __call, arginfo_proxy_call, ZEND_ACC_PUBLIC)
+	PHP_ME(Proxy, __construct, arginfo_proxy_construct, ZEND_ACC_PUBLIC)
+	{NULL, NULL, NULL}
 };
- 
+
 void proxy_init_new(TSRMLS_D) {
   zend_class_entry ce;
- 
+
   INIT_CLASS_ENTRY(ce, "Proxy", proxy_methods);
   proxy_class_ce = zend_register_internal_class(&ce TSRMLS_CC);
- 
+
+
   /* fields */
   zend_declare_property_bool(proxy_class_ce, "alive", strlen("alive"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
   zend_declare_property_bool(proxy_class_ce, "is_resolved", strlen("is_resolved"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-  zend_declare_property_bool(proxy_class_ce, "original", strlen("original"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
+  zend_declare_property_null (proxy_class_ce, "original", strlen("original"), ZEND_ACC_PROTECTED TSRMLS_CC );
+  /*zend_declare_property_bool(proxy_class_ce, "original", strlen("original"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);*/
+  zend_declare_property_string(proxy_class_ce, "classname", strlen("classname"), "", ZEND_ACC_PROTECTED TSRMLS_CC );
+
+
 }
- 
+
+PHP_METHOD(Proxy, __construct) {
+	char *classname;
+	int namelen;
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &classname, &namelen) == FAILURE) {
+		return;
+	}
+	 zend_update_property_stringl ( proxy_class_ce, this_ptr, "classname", strlen("classname"),
+	 classname, namelen TSRMLS_CC );
+  // TODO
+}
+
 PHP_METHOD(Proxy, getme) {
 	RETURN_STRING("foo bar",1);
-  // TODO                                                                                                                                                                   
+  // TODO
 }
 
 PHP_METHOD(Proxy, createOriginalObject) {
 	RETURN_STRING("orig obj",1);
-  // TODO                                                                                                                                                                   
+  // TODO
 }
 PHP_METHOD(Proxy, resolve) {
 	RETURN_STRING("resolve",1);
-  // TODO                                                                                                                                                                   
+  // TODO
 }
 PHP_METHOD(Proxy, __get) {
 	RETURN_STRING("get",1);
-  // TODO                                                                                                                                                                   
+  // TODO
 }
 PHP_METHOD(Proxy, __set) {
 	RETURN_STRING("set",1);
-  // TODO                                                                                                                                                                   
+  // TODO
 }
 PHP_METHOD(Proxy, __call) {
+
+	char *arg1, *arg2;
+	int l1,l2;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &arg1, &l1, &arg2, &l2) == FAILURE) {
+		return;
+	}
+	php_printf("Tring to call %s %s\n",arg1,arg2);
+
 	RETURN_STRING("try to call ",1);
-  // TODO                                                                                                                                                                   
+  // TODO
 }
 /* If you declare any globals in php_proxy.h uncomment this:
 ZEND_DECLARE_MODULE_GLOBALS(proxy)
@@ -88,7 +142,7 @@ ZEND_DECLARE_MODULE_GLOBALS(proxy)
  *
  * Every user visible function must have an entry in proxy_functions[].
  */
- 
+
 
 const zend_function_entry proxy_functions[] = {
 	PHP_FE(confirm_proxy_compiled,	NULL)		/* For testing, remove later. */
@@ -146,7 +200,7 @@ static void php_proxy_init_globals(zend_proxy_globals *proxy_globals)
 PHP_MINIT_FUNCTION(proxy)
 {
 	proxy_init_new(TSRMLS_C);
-	/* If you have INI entries, uncomment these lines 
+	/* If you have INI entries, uncomment these lines
 	REGISTER_INI_ENTRIES();
 	*/
 	return SUCCESS;
@@ -219,9 +273,9 @@ PHP_FUNCTION(confirm_proxy_compiled)
 	RETURN_STRINGL(strg, len, 0);
 }
 /* }}} */
-/* The previous line is meant for vim and emacs, so it can correctly fold and 
-   unfold functions in source code. See the corresponding marks just before 
-   function definition, where the functions purpose is also documented. Please 
+/* The previous line is meant for vim and emacs, so it can correctly fold and
+   unfold functions in source code. See the corresponding marks just before
+   function definition, where the functions purpose is also documented. Please
    follow this convention for the convenience of others editing your code.
 */
 

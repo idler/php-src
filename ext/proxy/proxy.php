@@ -1,4 +1,15 @@
 <?php
+
+class myTest
+{
+  protected $txt = 'Some text';
+  function thisIsNoMethod()
+  {
+    return "is not very strange";
+  }
+
+}
+
 $br = (php_sapi_name() == "cli")? "":"<br>";
 
 if(!extension_loaded('proxy')) {
@@ -18,8 +29,8 @@ if (extension_loaded($module)) {
 	$str = "Module $module is not compiled into PHP";
 }
 echo "$str\n";
-$p = new Proxy();
-$t = new Proxy();
+$p = new Proxy('myTest');
+$t = new Proxy('myTest');
 $t->alive=false;
 var_dump(array($p,$p->getme(),$t,$t->getme()));
 
